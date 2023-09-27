@@ -1,4 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
+import {
+  PlusIcon,
+  MinusIcon,
+  MagnifyingGlassIcon,
+} from "@radix-ui/react-icons";
 
 function App() {
   const [playlistTitle, setPlaylistTitle] = useState("");
@@ -66,7 +71,7 @@ function App() {
   }, [playlistTracks]);
 
   return (
-    <div>
+    <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white min-h-screen">
       <div className="flex justify-center">
         <Header />
       </div>
@@ -75,7 +80,7 @@ function App() {
         <SearchBar />
       </div>
 
-      <div className="flex justify-between gap-x-8 max-w-2xl mx-auto">
+      <div className="grid grid-cols-2 gap-x-8 max-w-2xl mx-auto">
         <SearchResults searchResults={searchResults} addTrack={addTrack} />
         <Tracklist
           playlistTitle={playlistTitle}
@@ -96,14 +101,25 @@ function Header() {
 }
 
 function SearchBar() {
-  return <input className="w-full ring-2 rounded px-2 py-1 ring-purple-500" />;
+  return (
+    <div className="w-full flex gap-4 mx-2 sm:mx-4 md:mx-8 lg:mx-12 rounded bg-violet-400">
+      <input
+        className="flex-1 rounded-l px-2 py-1 bg-transparent"
+        name="Search"
+      />
+      <button className="border-l  inline-flex items-center gap-2 px-2 my-1">
+        Search
+        <MagnifyingGlassIcon width={15} height={15} />
+      </button>
+    </div>
+  );
 }
 
 function SearchResults({ searchResults, addTrack }) {
   return (
-    <div>
+    <div className="space-y-2 rounded-lg bg-violet-950/50 p-8">
       <h2 className="pb-2 font-bold">Search Results</h2>
-      <ul>
+      <ul className="space-y-2">
         {searchResults.map((searchResult) => (
           <li key={searchResult.id}>
             <Track
@@ -129,9 +145,10 @@ function Tracklist({
   savePlaylist,
 }) {
   return (
-    <div>
+    <div className="space-y-2 flex flex-col rounded-lg bg-violet-950 bg-opacity-40 p-8 transition-all">
       <h2 className="font-bold">
         <input
+          className="w-full rounded px-2 py-1 bg-violet-400/40		"
           value={playlistTitle}
           onChange={(event) => {
             setPlaylistTitle(event.target.value);
@@ -139,7 +156,7 @@ function Tracklist({
         />
       </h2>
 
-      <ul>
+      <ul className="flex-1 space-y-2">
         {playlistTracks.map((playlistTrack) => (
           <li key={playlistTrack.id}>
             <Track
@@ -155,6 +172,7 @@ function Tracklist({
       </ul>
 
       <button
+        className="block mx-auto bg-indigo-600 hover:bg-indigo-700 shadow-lg rounded-lg p-2"
         onClick={() => {
           savePlaylist();
         }}
@@ -167,30 +185,40 @@ function Tracklist({
 
 function Track({ name, artist, album, id, uri, addTrack, removeTrack }) {
   return (
-    <div>
-      <p>{name}</p>
-      <p>{artist}</p>
-      <p>{album}</p>
-      <p>{id}</p>
-      <p>{uri}</p>
-      {addTrack && (
-        <button
-          onClick={() => {
-            addTrack({ name, artist, album, id, uri });
-          }}
-        >
-          Add
-        </button>
-      )}
-      {removeTrack && (
-        <button
-          onClick={() => {
-            removeTrack({ name, artist, album, id, uri });
-          }}
-        >
-          Remove
-        </button>
-      )}
+    <div className="flex items-center gap-2 rounded-lg bg-violet-950 bg-opacity-40 hover:bg-opacity-50 p-5 transition-all">
+      <div className="flex-1">
+        <p>{name}</p>
+        <div className="flex align-tems text-xs">
+          <span>
+            {artist} | {album}
+          </span>
+        </div>
+        <p className="hidden">{id}</p>
+        <p className="hidden">{uri}</p>
+      </div>
+
+      <div className="text-right">
+        {addTrack && (
+          <button
+            className="underline hover:underline-offset-4"
+            onClick={() => {
+              addTrack({ name, artist, album, id, uri });
+            }}
+          >
+            <PlusIcon height={15} width={15} />
+          </button>
+        )}
+        {removeTrack && (
+          <button
+            className="underline hover:underline-offset-4"
+            onClick={() => {
+              removeTrack({ name, artist, album, id, uri });
+            }}
+          >
+            <MinusIcon height={15} width={15} />
+          </button>
+        )}
+      </div>
     </div>
   );
 }
