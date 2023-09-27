@@ -9,24 +9,28 @@ function App() {
       artist: "Lana Del Rey",
       album: "The Great Gatsby Soundtrack",
       id: 0,
+      uri: "spotify:album:2up3OPMp9Tb4dAKM2erWXQ",
     },
     {
       name: "Wildest Dreams",
       artist: "Taylor Swift",
       album: "Taylors Version",
       id: 1,
+      uri: "spotify:album:2up3OPMp9Tb4dAKM2erWXR",
     },
     {
       name: "Bonfire",
       artist: "Childish Gambino",
       album: "Camp",
       id: 2,
+      uri: "spotify:album:2up3OPsp9Tb4dAKM2erWXQ",
     },
     {
       name: "Ceilings",
       artist: "Lizzy McAlpine",
       album: "five second flat",
       id: 3,
+      uri: "spotify:album:2up3OPMp9Tb4eAKM2erWXQ",
     },
   ]);
 
@@ -54,6 +58,13 @@ function App() {
     [playlistTracks]
   );
 
+  const savePlaylist = useCallback(() => {
+    const uris = playlistTracks.map((track) => track.uri);
+
+    setPlaylistTracks([]);
+    setPlaylistTitle("");
+  }, [playlistTracks]);
+
   return (
     <div>
       <div className="flex justify-center">
@@ -71,6 +82,7 @@ function App() {
           playlistTracks={playlistTracks}
           removeTrack={removeTrack}
           setPlaylistTitle={setPlaylistTitle}
+          savePlaylist={savePlaylist}
         />
       </div>
     </div>
@@ -99,6 +111,7 @@ function SearchResults({ searchResults, addTrack }) {
               artist={searchResult.artist}
               album={searchResult.album}
               id={searchResult.id}
+              uri={searchResult.uri}
               addTrack={addTrack}
             />
           </li>
@@ -113,6 +126,7 @@ function Tracklist({
   setPlaylistTitle,
   playlistTracks,
   removeTrack,
+  savePlaylist,
 }) {
   return (
     <div>
@@ -133,26 +147,36 @@ function Tracklist({
               artist={playlistTrack.artist}
               album={playlistTrack.album}
               id={playlistTrack.id}
+              uri={playlistTrack.uri}
               removeTrack={removeTrack}
             />
           </li>
         ))}
       </ul>
+
+      <button
+        onClick={() => {
+          savePlaylist();
+        }}
+      >
+        Save & Export
+      </button>
     </div>
   );
 }
 
-function Track({ name, artist, album, id, addTrack, removeTrack }) {
+function Track({ name, artist, album, id, uri, addTrack, removeTrack }) {
   return (
     <div>
       <p>{name}</p>
       <p>{artist}</p>
       <p>{album}</p>
       <p>{id}</p>
+      <p>{uri}</p>
       {addTrack && (
         <button
           onClick={() => {
-            addTrack({ name, artist, album, id });
+            addTrack({ name, artist, album, id, uri });
           }}
         >
           Add
@@ -161,7 +185,7 @@ function Track({ name, artist, album, id, addTrack, removeTrack }) {
       {removeTrack && (
         <button
           onClick={() => {
-            removeTrack({ name, artist, album, id });
+            removeTrack({ name, artist, album, id, uri });
           }}
         >
           Remove
