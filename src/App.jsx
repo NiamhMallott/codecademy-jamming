@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useSearchResults, useCreatePlaylist } from "./api";
 import {
   PlusIcon,
   MinusIcon,
@@ -8,36 +9,8 @@ import {
 function App() {
   const [playlistTitle, setPlaylistTitle] = useState("");
   const [playlistTracks, setPlaylistTracks] = useState([]);
-  const [searchResults, setSearchResults] = useState([
-    {
-      name: "Young and Beautiful",
-      artist: "Lana Del Rey",
-      album: "The Great Gatsby Soundtrack",
-      id: 0,
-      uri: "spotify:album:2up3OPMp9Tb4dAKM2erWXQ",
-    },
-    {
-      name: "Wildest Dreams",
-      artist: "Taylor Swift",
-      album: "Taylors Version",
-      id: 1,
-      uri: "spotify:album:2up3OPMp9Tb4dAKM2erWXR",
-    },
-    {
-      name: "Bonfire",
-      artist: "Childish Gambino",
-      album: "Camp",
-      id: 2,
-      uri: "spotify:album:2up3OPsp9Tb4dAKM2erWXQ",
-    },
-    {
-      name: "Ceilings",
-      artist: "Lizzy McAlpine",
-      album: "five second flat",
-      id: 3,
-      uri: "spotify:album:2up3OPMp9Tb4eAKM2erWXQ",
-    },
-  ]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchResults = useSearchResults(searchQuery);
 
   const addTrack = useCallback(
     (newTrack) => {
@@ -77,7 +50,7 @@ function App() {
       </div>
 
       <div className="flex justify-center my-8 max-w-2xl mx-auto">
-        <SearchBar />
+        <SearchBar onClick={(title) => setSearchQuery(title)} />
       </div>
 
       <div className="grid grid-cols-2 gap-x-8 max-w-2xl mx-auto">
@@ -100,14 +73,23 @@ function Header() {
   return <h1 className="text-2xl">Jamming</h1>;
 }
 
-function SearchBar() {
+function SearchBar({ onClick }) {
+  const [title, setTitle] = useState("");
+
   return (
     <div className="w-full flex gap-4 mx-2 sm:mx-4 md:mx-8 lg:mx-12 rounded bg-violet-400">
       <input
         className="flex-1 rounded-l px-2 py-1 bg-transparent"
+        value={title}
+        onChange={(event) => {
+          setTitle(event.target.value);
+        }}
         name="Search"
       />
-      <button className="border-l  inline-flex items-center gap-2 px-2 my-1">
+      <button
+        className="border-l inline-flex items-center gap-2 px-2 my-1"
+        onClick={() => onClick(title)}
+      >
         Search
         <MagnifyingGlassIcon width={15} height={15} />
       </button>
@@ -126,6 +108,7 @@ function SearchResults({ searchResults, addTrack }) {
               name={searchResult.name}
               artist={searchResult.artist}
               album={searchResult.album}
+              image={searchResult.image}
               id={searchResult.id}
               uri={searchResult.uri}
               addTrack={addTrack}
@@ -144,6 +127,8 @@ function Tracklist({
   removeTrack,
   savePlaylist,
 }) {
+  const createPlaylist = useCreatePlaylist();
+
   return (
     <div className="space-y-2 flex flex-col rounded-lg bg-violet-950 bg-opacity-40 p-8 transition-all">
       <h2 className="font-bold">
@@ -163,6 +148,7 @@ function Tracklist({
               name={playlistTrack.name}
               artist={playlistTrack.artist}
               album={playlistTrack.album}
+              image={playlistTrack.image}
               id={playlistTrack.id}
               uri={playlistTrack.uri}
               removeTrack={removeTrack}
@@ -174,7 +160,8 @@ function Tracklist({
       <button
         className="block mx-auto bg-indigo-600 hover:bg-indigo-700 shadow-lg rounded-lg p-2"
         onClick={() => {
-          savePlaylist();
+          createPlaylist(playlistTitle, playlistTracks);
+          // savePlaylist();
         }}
       >
         Save & Export
@@ -183,10 +170,11 @@ function Tracklist({
   );
 }
 
-function Track({ name, artist, album, id, uri, addTrack, removeTrack }) {
+function Track({ name, artist, album, id, uri, image, addTrack, removeTrack }) {
   return (
     <div className="flex items-center gap-2 rounded-lg bg-violet-950 bg-opacity-40 hover:bg-opacity-50 p-5 transition-all">
       <div className="flex-1">
+        <img className="rounded" src={image} />
         <p>{name}</p>
         <div className="flex align-tems text-xs">
           <span>
@@ -202,7 +190,7 @@ function Track({ name, artist, album, id, uri, addTrack, removeTrack }) {
           <button
             className="underline hover:underline-offset-4"
             onClick={() => {
-              addTrack({ name, artist, album, id, uri });
+              addTrack({ name, artist, album, id, uri, image });
             }}
           >
             <PlusIcon height={15} width={15} />
