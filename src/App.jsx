@@ -43,6 +43,17 @@ function App() {
     [playlistTracks]
   );
 
+  const removeTrack = useCallback(
+    (selectedTrack) => {
+      setPlaylistTracks(
+        playlistTracks.filter((track) => {
+          return track.id !== selectedTrack.id;
+        })
+      );
+    },
+    [playlistTracks]
+  );
+
   return (
     <div>
       <div className="flex justify-center">
@@ -58,6 +69,7 @@ function App() {
         <Tracklist
           playlistTitle={playlistTitle}
           playlistTracks={playlistTracks}
+          removeTrack={removeTrack}
         />
       </div>
     </div>
@@ -95,7 +107,7 @@ function SearchResults({ searchResults, addTrack }) {
   );
 }
 
-function Tracklist({ playlistTitle, playlistTracks }) {
+function Tracklist({ playlistTitle, playlistTracks, removeTrack }) {
   return (
     <div>
       <h2 className="font-bold">Playlist</h2>
@@ -108,6 +120,7 @@ function Tracklist({ playlistTitle, playlistTracks }) {
               artist={playlistTrack.artist}
               album={playlistTrack.album}
               id={playlistTrack.id}
+              removeTrack={removeTrack}
             />
           </li>
         ))}
@@ -116,7 +129,7 @@ function Tracklist({ playlistTitle, playlistTracks }) {
   );
 }
 
-function Track({ name, artist, album, id, addTrack }) {
+function Track({ name, artist, album, id, addTrack, removeTrack }) {
   return (
     <div>
       <p>{name}</p>
@@ -130,6 +143,15 @@ function Track({ name, artist, album, id, addTrack }) {
           }}
         >
           Add
+        </button>
+      )}
+      {removeTrack && (
+        <button
+          onClick={() => {
+            removeTrack({ name, artist, album, id });
+          }}
+        >
+          Remove
         </button>
       )}
     </div>
