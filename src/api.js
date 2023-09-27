@@ -17,7 +17,7 @@ function login() {
 
 const queryParams = new window.URLSearchParams(window.location.hash.slice(1));
 
-let shouldRequest = false;
+let shouldRequest = true;
 
 if (queryParams.has("access_token")) {
   const token = queryParams.get("access_token");

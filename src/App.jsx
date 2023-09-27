@@ -10,6 +10,7 @@ function App() {
   const [playlistTitle, setPlaylistTitle] = useState("");
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [storePlaylist, setStorePlaylist] = useState([]); // { title: string, tracks: Array<Track> }
   const searchResults = useSearchResults(searchQuery);
 
   const addTrack = useCallback(
@@ -43,6 +44,11 @@ function App() {
     setPlaylistTitle("");
   }, [playlistTracks]);
 
+  const replacePlaylist = useCallback((newPlaylist) => {
+    setPlaylistTitle(newPlaylist.title);
+    setPlaylistTracks(newPlaylist.tracks);
+  }, []);
+
   return (
     <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white min-h-screen">
       <div className="flex justify-center">
@@ -53,7 +59,7 @@ function App() {
         <SearchBar onClick={(title) => setSearchQuery(title)} />
       </div>
 
-      <div className="grid grid-cols-2 gap-x-8 max-w-2xl mx-auto">
+      <div className="grid grid-cols-3 gap-x-8 max-w-6xl mx-auto">
         <SearchResults searchResults={searchResults} addTrack={addTrack} />
         <Tracklist
           playlistTitle={playlistTitle}
@@ -61,6 +67,12 @@ function App() {
           removeTrack={removeTrack}
           setPlaylistTitle={setPlaylistTitle}
           savePlaylist={savePlaylist}
+          setStorePlaylist={setStorePlaylist}
+        />
+        <SavedPlaylists
+          setStorePlaylist={setStorePlaylist}
+          storePlaylist={storePlaylist}
+          replacePlaylist={replacePlaylist}
         />
       </div>
     </div>
@@ -101,7 +113,7 @@ function SearchResults({ searchResults, addTrack }) {
   return (
     <div className="space-y-2 rounded-lg bg-violet-950/50 p-8">
       <h2 className="pb-2 font-bold">Search Results</h2>
-      <ul className="space-y-2">
+      <ul className="space-y-2 max-h-[60vh] overflow-y-auto">
         {searchResults.map((searchResult) => (
           <li key={searchResult.id}>
             <Track
@@ -125,7 +137,7 @@ function Tracklist({
   setPlaylistTitle,
   playlistTracks,
   removeTrack,
-  savePlaylist,
+  setStorePlaylist,
 }) {
   const createPlaylist = useCreatePlaylist();
 
@@ -141,7 +153,7 @@ function Tracklist({
         />
       </h2>
 
-      <ul className="flex-1 space-y-2">
+      <ul className="flex-1 space-y-2 max-h-[60vh] overflow-y-auto">
         {playlistTracks.map((playlistTrack) => (
           <li key={playlistTrack.id}>
             <Track
@@ -161,6 +173,8 @@ function Tracklist({
         className="block mx-auto bg-indigo-600 hover:bg-indigo-700 shadow-lg rounded-lg p-2"
         onClick={() => {
           createPlaylist(playlistTitle, playlistTracks);
+          const newPlaylist = { title: playlistTitle, tracks: playlistTracks };
+          setStorePlaylist((playlists) => [...playlists, newPlaylist]);
           // savePlaylist();
         }}
       >
@@ -206,6 +220,29 @@ function Track({ name, artist, album, id, uri, image, addTrack, removeTrack }) {
             <MinusIcon height={15} width={15} />
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+function SavedPlaylists({ storePlaylist, setStorePlaylist, replacePlaylist }) {
+  return (
+    <div className="space-y-2 flex flex-nowrap rounded-lg bg-violet-950 bg-opacity-40 p-8 transition-all">
+      <h2 className="pb-2 font-bold">Saved Playlists</h2>
+
+      <div>
+        <ul>
+          {storePlaylist.map((playlist, i) => (
+            <li key={i}>
+              <button
+                className="font-bold underline underline-offset-1 hover:underline-offset-4"
+                onClick={() => replacePlaylist(playlist)}
+              >
+                {playlist.title}
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
