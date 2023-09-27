@@ -70,6 +70,7 @@ function App() {
           playlistTitle={playlistTitle}
           playlistTracks={playlistTracks}
           removeTrack={removeTrack}
+          setPlaylistTitle={setPlaylistTitle}
         />
       </div>
     </div>
@@ -107,11 +108,23 @@ function SearchResults({ searchResults, addTrack }) {
   );
 }
 
-function Tracklist({ playlistTitle, playlistTracks, removeTrack }) {
+function Tracklist({
+  playlistTitle,
+  setPlaylistTitle,
+  playlistTracks,
+  removeTrack,
+}) {
   return (
     <div>
-      <h2 className="font-bold">Playlist</h2>
-      <input value={playlistTitle} />
+      <h2 className="font-bold">
+        <input
+          value={playlistTitle}
+          onChange={(event) => {
+            setPlaylistTitle(event.target.value);
+          }}
+        />
+      </h2>
+
       <ul>
         {playlistTracks.map((playlistTrack) => (
           <li key={playlistTrack.id}>
