@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { useSearchResults, useCreatePlaylist } from "./api";
+import { useSearchResults, useCreatePlaylist } from "./hooks/useApi";
+import { useLocalState } from "./hooks/useLocalStorage";
 import {
   PlusIcon,
   MinusIcon,
@@ -10,7 +11,7 @@ function App() {
   const [playlistTitle, setPlaylistTitle] = useState("");
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [storePlaylist, setStorePlaylist] = useState([]); // { title: string, tracks: Array<Track> }
+  const [storePlaylist, setStorePlaylist] = useLocalState("storePlaylist", []); // { title: string, tracks: Array<Track> }
   const searchResults = useSearchResults(searchQuery);
 
   const addTrack = useCallback(
@@ -231,7 +232,7 @@ function SavedPlaylists({ storePlaylist, setStorePlaylist, replacePlaylist }) {
       <h2 className="pb-2 font-bold">Saved Playlists</h2>
 
       <div>
-        <ul>
+        <ul className="pt-6">
           {storePlaylist.map((playlist, i) => (
             <li key={i}>
               <button
